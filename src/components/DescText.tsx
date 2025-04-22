@@ -1,15 +1,22 @@
 import { useRef, useEffect, useState } from "react";
 import { useSprings, animated } from "@react-spring/web";
+import type { SpringValue } from "@react-spring/web";
 
-const AnimatedSpan = animated.span as React.FC<
-  React.HTMLAttributes<HTMLSpanElement>
->;
+type AnimatedStyle = {
+  [K in keyof React.CSSProperties]?:
+    | React.CSSProperties[K]
+    | SpringValue<React.CSSProperties[K]>;
+};
+
+const AnimatedSpan: React.FC<
+  React.HTMLAttributes<HTMLSpanElement> & { style?: AnimatedStyle }
+> = animated.span;
 
 interface BlurTextProps {
   text?: string;
 }
 
-const BlurText: React.FC<BlurTextProps> = ({text = ""}) => {
+const BlurText: React.FC<BlurTextProps> = ({ text = "" }) => {
   const elements = text.split(" ");
   const [inView, setInView] = useState(false);
   const ref = useRef<HTMLParagraphElement>(null);
@@ -44,7 +51,9 @@ const BlurText: React.FC<BlurTextProps> = ({text = ""}) => {
         transform: "translate3d(0,50px,0)",
       },
       to: inView
-        ? async (next: (props: Record<string, string | number>) => Promise<void>) => {
+        ? async (
+            next: (props: Record<string, string | number>) => Promise<void>
+          ) => {
             await next({
               filter: "blur(5px)",
               opacity: 0.5,
@@ -68,11 +77,15 @@ const BlurText: React.FC<BlurTextProps> = ({text = ""}) => {
   );
 
   return (
-    <p ref={ref} className="text-center lg:text-justify text-sm lg:my-3 lg:text-base text-gray-300 max-w-120 lg:m-0 ">
+    <p
+      ref={ref}
+      className="text-center lg:text-justify text-sm lg:my-3 lg:text-base text-gray-300 max-w-120 lg:m-0 "
+    >
       {springs.map((props, index) => (
         <AnimatedSpan
           key={index}
-          style={props}
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          style={props as any}
           className="inline-block will-change-[transform,filter,opacity]"
         >
           {elements[index]}

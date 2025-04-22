@@ -58,6 +58,7 @@ const SplitText: React.FC<SplitTextProps> = ({ text = "", className = "" }) => {
             <span key={wordIndex} className="inline-block whitespace-nowrap">
               {word.split("").map((letter) => {
                 const animatedLetter = (
+                  // @ts-expect-error animated span accepts children and spring style
                   <animated.span
                     key={letterIndex}
                     style={springs[letterIndex]}
